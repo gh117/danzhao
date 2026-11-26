@@ -275,8 +275,8 @@ mark{background:rgba(255,180,84,.38);color:inherit;border-radius:3px;padding:0 1
     </div>
   </details>
 
-  <details class="tl" id="mjbox" open>
-    <summary>还能考哪些专业 · 电子与信息大类全目录</summary>
+  <details class="tl" id="mjbox">
+    <summary>还能考哪些专业 · 电子与信息大类 52 门</summary>
     <div class="tlbody">
       <div class="mjtip">
         你的专业属 <b>51 电子与信息大类 · 5102 计算机类</b>。单招填志愿不限专业类，同类别、同大类里别的类别都填得进（跨类后技能测试考什么，看各校章程）。<br>
@@ -519,7 +519,7 @@ function renderMajorBox(){
     return `<div class="mjgrp"><h5>${MJCAT[k]}${k==="9801"?"":" "+k} <em>${n}/${L.length} 门有章程记录</em></h5>
       <div class="mjchips">${L.map(m => m.x > 0
         ? `<button class="mj${st.mj===m.c?" on":""}" data-mj="${m.c}" aria-pressed="${st.mj===m.c}">${m.n}<em>${m.x}</em></button>`
-        : `<button class="mj zero" data-mj0="${m.c}" aria-pressed="false" title="2026 年章程未明确写到这个专业">${m.n}<em>0</em></button>`
+        : `<button class="mj zero" data-mj0="${m.c}" title="2026 年章程未明确写到这个专业">${m.n}<em>0</em></button>`
       ).join("")}</div></div>`;
   }).join("");
   const box = $("mjsum");
