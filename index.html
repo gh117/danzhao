@@ -184,6 +184,14 @@ h1.brand{margin:0}
   .card{break-inside:avoid;border:1px solid #ccc;box-shadow:none}
   .card::before{display:none}
 }
+mark{background:rgba(255,180,84,.38);color:inherit;border-radius:3px;padding:0 1px}
+.cleft{cursor:pointer}
+.kv{display:flex;justify-content:space-between;gap:14px;padding:9px 0;border-bottom:1px solid var(--line);font-size:13.5px}
+.kv>span{color:var(--tx2);flex:0 0 auto}
+.kv>b{text-align:right;font-weight:650}
+.dact{display:flex;gap:8px;margin-top:14px}
+.dact .btn{flex:1;text-align:center;text-decoration:none;display:inline-block}
+.dtip{font-size:12px;color:var(--tx3);margin-top:10px;line-height:1.7}
 .foot{margin-top:22px;color:var(--tx3);font-size:11.5px;line-height:1.9;border-top:1px solid var(--line);padding-top:13px}
 .foot b{color:var(--tx2);font-weight:600}
 </style>
@@ -293,6 +301,7 @@ h1.brand{margin:0}
   <div class="listhead">
     <span id="resLabel" aria-live="polite">—</span>
     <span style="display:flex;gap:14px">
+      <button id="randBtn">🎲 随机</button>
       <button id="copyBtn">复制清单</button>
       <button id="reset">重置筛选</button>
     </span>
@@ -327,6 +336,13 @@ h1.brand{margin:0}
     <h4><span id="sheetTitle">对比</span> <button id="mClose">✕</button></h4>
     <div id="cmpBox" style="overflow-x:auto"><table class="ctable" id="ctable" aria-label="院校对比"></table></div>
     <div id="scoreBox" style="display:none"></div>
+  </div>
+</div>
+
+<div class="modal" id="dmodal">
+  <div class="sheet">
+    <h4><span id="dTitle">院校详情</span> <button id="dClose">✕</button></h4>
+    <div id="dBody"></div>
   </div>
 </div>
 
@@ -396,14 +412,21 @@ function sortBy(a,b){
 }
 
 /* ---- 渲染 ---- */
+function hi(txt){
+  if(!st.kw) return txt;
+  const k = st.kw.trim();
+  if(!k) return txt;
+  const safe = k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return String(txt).replace(new RegExp(safe,"gi"), m => `<mark>${m}</mark>`);
+}
 function cardHTML(d){
   const lv = DK[d.dk];
   const on = picked.includes(d.c), lk = lockCode === d.c;
   return `<article class="card dk${d.dk}${lk?" locked":""}">
     <div class="ctop">
-      <div class="cleft">
+      <div class="cleft" data-detail="${d.c}" role="button" tabindex="0" aria-label="查看 ${d.n} 详情">
         <span class="avatar">${d.n.slice(0,1)}</span>
-        <div><div class="cname">${d.n}</div><div class="csub">代码 ${d.c} · ${d.ct}</div></div>
+        <div><div class="cname">${hi(d.n)}</div><div class="csub">代码 ${d.c} · ${hi(d.ct)}</div></div>
       </div>
       <div class="acts">
         <button class="act lock${lk?" on":""}" data-lock="${d.c}" aria-label="锁定为我的志愿">${lk?"★":"☆"}</button>
@@ -523,6 +546,8 @@ $("reset").addEventListener("click", () => {
   syncToggles(); render();
 });
 $("list").addEventListener("click", e => {
+  const dt = e.target.closest("[data-detail]");
+  if(dt && !e.target.closest("[data-pick],[data-lock]")){ openDetail(dt.dataset.detail); return; }
   const pk = e.target.closest("[data-pick]");
   if(pk){
     const c = pk.dataset.pick;
@@ -546,6 +571,11 @@ $("list").addEventListener("click", e => {
 });
 $("list").addEventListener("click", e => {
   if(e.target.closest("[data-reset2]")) $("reset").click();
+});
+$("list").addEventListener("keydown", e => {
+  if(e.key!=="Enter" && e.key!==" ") return;
+  const dt = e.target.closest("[data-detail]");
+  if(dt){ e.preventDefault(); openDetail(dt.dataset.detail); }
 });
 $("lockClear").addEventListener("click", () => { lockCode=null; store.set("dz_lock",null); render(); renderLock(); });
 /* 权重 */
@@ -650,6 +680,45 @@ function openCompare(){
   $("scoreBox").style.display = "none";
   $("modal").classList.add("show");
 }
+/* 详情弹层 */
+function openDetail(code){
+  const d = DB.find(x => x.c === code);
+  if(!d) return;
+  $("dTitle").textContent = d.n;
+  const rows = [
+    ["院校代码", d.c],
+    ["所在地", d.ct + (kmOf(d) ? "（离家约 "+kmOf(d)+" km）" : "")],
+    ["办学性质", d.p===1 ? "公办" : "民办"],
+    ["办学层次", d.lv===1 ? "本科院校（单招专业仍为专科）" : "高职（专科）"],
+    ["对口考生", DK[d.dk].t + (d.dk===0 ? " · 打招生办电话确认" : "")],
+    ["专业", d.i ? "开设信息安全技术应用（510207）" : "未查到该专业，按招生计划核对"],
+    ["学费", d.f ? (d.f[0]===d.f[1] ? d.f[0]+" 元/年" : d.f[0]+"–"+d.f[1]+" 元/年") : "章程未抓到，待核对"],
+    ["住宿费", d.h ? (d.h[0]===d.h[1] ? d.h[0]+" 元/年" : d.h[0]+"–"+d.h[1]+" 元/年") : "待核对"],
+    ["三年花费", total3(d) ? totalTxt(d) : "待核对"]
+  ];
+  $("dBody").innerHTML = rows.map(([k,v]) => `<div class="kv"><span>${k}</span><b>${v}</b></div>`).join("")
+    + `<div class="dact"><button class="btn" data-dlock="${d.c}">设为我的志愿</button>`
+    + (d.u ? `<a class="btn ghost" href="${d.u}" target="_blank" rel="noopener">看原始章程</a>` : "") + `</div>`
+    + `<div class="dtip">单招只能填一所学校，志愿填在 4 月 21–22 日。数据抓于 2026-11-25，以各校招生计划为准。</div>`;
+  $("dmodal").classList.add("show");
+}
+$("dClose").addEventListener("click", () => $("dmodal").classList.remove("show"));
+$("dmodal").addEventListener("click", e => { if(e.target === $("dmodal")) $("dmodal").classList.remove("show"); });
+$("dBody").addEventListener("click", e => {
+  const b = e.target.closest("[data-dlock]"); if(!b) return;
+  lockCode = b.dataset.dlock; store.set("dz_lock", lockCode);
+  $("dmodal").classList.remove("show");
+  render(); renderLock(); toast("已锁定：" + (DB.find(x=>x.c===lockCode)||{}).n);
+});
+/* 随机挑一所 */
+$("randBtn").addEventListener("click", () => {
+  const L = DB.filter(match);
+  if(!L.length) return toast("当前没有可随机的结果");
+  const d = L[Math.floor(Math.random()*L.length)];
+  openDetail(d.c);
+  toast("🎲 抽到：" + d.n);
+});
+
 let toastTimer;
 function toast(msg){
   const t = $("toast");
