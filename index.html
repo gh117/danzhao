@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0e1116">
+<title>河南高职单招 · 择校助手</title>
+<style>
+:root{
+  --bg:#0e1116; --bg2:#12161d; --card:#171b23; --card2:#1e232d; --line:#272d38;
+  --tx:#e9edf5; --tx2:#a3adbf; --tx3:#8d97aa;
+  --acc:#5aa2ff; --acc2:#8b5cf6;
+  --good:#3ddc97; --warn:#ffb454; --bad:#ff6b81; --pri:#a78bfa;
+  --shadow:0 6px 24px rgba(0,0,0,.35); --r:16px;
+}
+@media (prefers-color-scheme: light){
+  :root{
+    --bg:#f4f6fa; --bg2:#ffffff; --card:#ffffff; --card2:#eef2f8; --line:#e1e7f1;
+    --tx:#101828; --tx2:#59647a; --tx3:#646e82;
+    --acc:#2f6fed; --acc2:#7c3aed;
+    --good:#0a7a4d; --warn:#8f5705; --bad:#c41f3c; --pri:#7c3aed;
+    --shadow:0 4px 18px rgba(28,45,80,.07);
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{margin:0;padding:0 0 100px;background:var(--bg);color:var(--tx);
+  font:15px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC","Noto Sans CJK SC","Microsoft YaHei",sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:680px;margin:0 auto;padding:0 14px}
+
+.top{position:sticky;top:0;z-index:30;background:rgba(14,17,22,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+@media (prefers-color-scheme: light){.top{background:rgba(244,246,250,.9)}}
+.top .wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;padding-top:12px;padding-bottom:12px}
+.brand{font-size:16px;font-weight:700;letter-spacing:.3px;display:flex;align-items:center;gap:7px}
+.brand i{width:22px;height:22px;border-radius:7px;background:linear-gradient(135deg,var(--acc),var(--acc2));display:inline-block}
+.ver{font-size:10.5px;font-weight:600;color:var(--acc);border:1px solid rgba(90,162,255,.42);padding:1px 6px;border-radius:6px}
+.count{font-size:12.5px;color:var(--tx2);font-variant-numeric:tabular-nums}
+.count b{color:var(--tx);font-size:14px}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:14px 0 12px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:9px 10px;text-align:center}
+.stat .v{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.3px}
+.stat .k{font-size:11px;color:var(--tx3);margin-top:1px}
+.stat.g .v{color:var(--good)} .stat.b .v{color:var(--bad)} .stat.p .v{color:var(--pri)}
+.stat.a .v{color:#c4801f}
+@media (prefers-color-scheme: light){.stat.a .v{color:#8a5a00}}
+
+.alert{background:linear-gradient(135deg,rgba(255,107,129,.13),rgba(90,162,255,.09));border:1px solid rgba(255,107,129,.32);border-radius:14px;padding:11px 13px;font-size:13px;line-height:1.62;margin-bottom:12px}
+.alert b{color:var(--bad)}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 13px;margin-bottom:12px;box-shadow:var(--shadow)}
+.search{position:relative}
+.search input{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:11px;padding:11px 38px 11px 34px;font-size:15px;outline:none;transition:border-color .18s,box-shadow .18s}
+.search input:focus{border-color:var(--acc);box-shadow:0 0 0 3px rgba(90,162,255,.18)}
+.search .ico{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:14px}
+.search .clr{position:absolute;right:8px;top:50%;transform:translateY(-50%);width:24px;height:24px;border:none;border-radius:8px;background:var(--card2);color:var(--tx2);font-size:14px;display:none;cursor:pointer}
+.search.has .clr{display:block}
+
+.seg{display:flex;gap:3px;background:var(--card2);border-radius:12px;padding:3px;margin-top:11px}
+.seg button{flex:1;border:none;background:none;color:var(--tx2);padding:8px 4px;border-radius:9px;font-size:13px;cursor:pointer;font-weight:500;transition:background .16s,color .16s}
+.seg button.on{background:var(--card);color:var(--tx);font-weight:700;box-shadow:0 1px 4px rgba(0,0,0,.14)}
+.seg button.on.g{color:var(--good)} .seg button.on.p{color:#a78bfa}
+
+.cities{display:flex;gap:7px;overflow-x:auto;padding:11px 0 2px;scrollbar-width:none}
+.cities::-webkit-scrollbar{display:none}
+.city{flex:0 0 auto;border:1px solid var(--line);background:var(--card2);color:var(--tx2);padding:8px 13px;min-height:36px;border-radius:99px;font-size:13px;cursor:pointer;white-space:nowrap;transition:all .16s}
+.city.on{background:rgba(90,162,255,.18);border-color:var(--acc);color:var(--acc);font-weight:600}
+
+.toggles{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}
+.tg{border:1px solid var(--line);background:var(--card2);color:var(--tx2);padding:8px 12px;min-height:36px;border-radius:10px;font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:5px;transition:all .16s}
+.tg.on{background:rgba(90,162,255,.16);border-color:var(--acc);color:var(--acc);font-weight:600}
+.tg .n{font-size:11px;opacity:.75;font-variant-numeric:tabular-nums}
+
+.toolrow{display:flex;align-items:center;gap:8px;margin-top:11px}
+.toolrow select{flex:1;background:var(--card2);border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:9px 10px;font-size:13.5px;outline:none}
+.actsum{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.actsum:empty{display:none}
+.achip{display:inline-flex;align-items:center;gap:5px;background:rgba(90,162,255,.14);border:1px solid rgba(90,162,255,.34);color:var(--acc);font-size:12px;padding:4px 8px;border-radius:8px;cursor:pointer}
+.achip b{font-weight:700;opacity:.7}
+
+details.tl{background:var(--card);border:1px solid var(--line);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
+details.tl summary{padding:12px 14px;font-size:13.5px;font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between;align-items:center}
+details.tl summary::-webkit-details-marker{display:none}
+details.tl summary::after{content:"›";color:var(--tx3);transform:rotate(90deg);transition:transform .2s}
+details.tl[open] summary::after{transform:rotate(-90deg)}
+.tlbody{padding:0 14px 12px;border-top:1px solid var(--line)}
+.tlrow{display:flex;gap:10px;font-size:13px;padding:7px 0;align-items:baseline}
+.tlrow .d{color:var(--acc);font-weight:700;min-width:82px;font-variant-numeric:tabular-nums}
+
+.mylock{display:none;background:linear-gradient(135deg,rgba(90,162,255,.16),rgba(139,92,246,.14));border:1px solid rgba(90,162,255,.45);border-radius:var(--r);padding:11px 13px;margin-bottom:10px}
+.mylock.show{display:block}
+.mylock .lb{font-size:11px;color:var(--acc);font-weight:700;letter-spacing:.6px}
+.mylock .nm{font-size:15.5px;font-weight:700;margin-top:2px}
+.mylock .ms{font-size:12.5px;color:var(--tx2);margin-top:2px}
+.mylock button{margin-top:8px;border:1px solid var(--line);background:var(--card2);color:var(--tx2);border-radius:9px;padding:5px 11px;font-size:12px;cursor:pointer}
+
+.listhead{display:flex;justify-content:space-between;align-items:center;margin:4px 0 9px;font-size:12.5px;color:var(--tx2)}
+.listhead button{background:none;border:none;color:var(--acc);font-size:12.5px;cursor:pointer;padding:4px 0}
+
+.card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:12px 13px 11px 15px;margin-bottom:9px;overflow:hidden;transition:border-color .18s,box-shadow .18s}
+.card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--tx3)}
+.card.dk1::before{background:var(--good)} .card.dk2::before{background:var(--bad)} .card.dk0::before{background:var(--warn)}
+.card.locked{border-color:var(--acc);box-shadow:0 0 0 1px rgba(90,162,255,.5)}
+.ctop{display:flex;align-items:flex-start;justify-content:space-between;gap:9px}
+.cleft{display:flex;gap:10px;align-items:center;min-width:0}
+.avatar{width:34px;height:34px;border-radius:11px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--acc),var(--acc2))}
+.cname{font-size:15.5px;font-weight:650;line-height:1.35;letter-spacing:.1px}
+.csub{font-size:11.5px;color:var(--tx3);margin-top:1px;font-variant-numeric:tabular-nums}
+.acts{display:flex;gap:6px;flex:0 0 auto}
+.act{width:34px;height:34px;border-radius:10px;border:1px solid var(--line);background:var(--card2);color:var(--tx2);font-size:14px;line-height:1;cursor:pointer;transition:all .16s;padding:0}
+.act.pick.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.act.lock.on{background:rgba(255,180,84,.18);border-color:var(--warn);color:var(--warn)}
+.tags{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.tag{font-size:11px;padding:2px 7px;border-radius:6px;font-weight:600;white-space:nowrap}
+.t-ok{background:rgba(61,220,151,.16);color:var(--good)}
+.t-no{background:rgba(255,107,129,.16);color:var(--bad)}
+.t-mid{background:rgba(255,180,84,.16);color:var(--warn)}
+.t-info{background:rgba(90,162,255,.16);color:var(--acc)}
+.t-pub{background:rgba(90,162,255,.13);color:var(--acc)}
+.t-ben{background:rgba(255,180,84,.18);color:#c4801f}
+@media (prefers-color-scheme: light){.t-ben{background:rgba(255,180,84,.22);color:#8a5a00}}
+.t-pri{background:rgba(139,92,246,.16);color:var(--pri)}
+@media (prefers-color-scheme: light){.t-pri{background:rgba(124,58,237,.12);color:var(--pri)}.t-info,.t-pub{color:#1d5bd0}.t-ok{color:#076a41}.t-no{color:#b81a35}}
+.facts{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;font-size:12.5px;color:var(--tx2);font-variant-numeric:tabular-nums}
+.facts .money{color:var(--tx);font-weight:600}
+.facts .tot{color:var(--acc);font-weight:600}
+.facts a{color:var(--acc);text-decoration:none;border-bottom:1px dotted rgba(90,162,255,.55)}
+.empty{text-align:center;padding:40px 0;color:var(--tx2);font-size:13.5px}
+.empty .em{font-size:30px;display:block;margin-bottom:8px;opacity:.5}
+
+.bar{position:fixed;left:0;right:0;bottom:0;z-index:40;display:none;align-items:center;justify-content:space-between;gap:10px;padding:11px 16px calc(11px + env(safe-area-inset-bottom));background:rgba(18,22,29,.95);backdrop-filter:blur(14px);border-top:1px solid var(--line);box-shadow:0 -6px 24px rgba(0,0,0,.28)}
+@media (prefers-color-scheme: light){.bar{background:rgba(255,255,255,.96)}}
+.bar.show{display:flex}
+.bar .txt{font-size:13px;color:var(--tx2)} .bar .txt b{color:var(--tx)}
+.btn{border:none;border-radius:11px;padding:9px 16px;font-size:14px;font-weight:650;cursor:pointer;background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+.btn.ghost{background:var(--card2);color:var(--tx2);font-weight:500}
+
+.modal{position:fixed;inset:0;z-index:50;display:none;background:rgba(0,0,0,.55)}
+.modal.show{display:block}
+.sheet{position:absolute;left:0;right:0;bottom:0;max-height:86vh;overflow:auto;background:var(--bg2);border-radius:20px 20px 0 0;padding:16px 14px calc(20px + env(safe-area-inset-bottom));animation:up .22s ease}
+@keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}
+.sheet h4{margin:0 0 12px;font-size:15px;display:flex;justify-content:space-between;align-items:center}
+.sheet h4 button{background:none;border:none;color:var(--tx2);font-size:20px;cursor:pointer;line-height:1}
+.ctable{width:100%;border-collapse:collapse;font-size:12.5px}
+.ctable th,.ctable td{padding:8px 6px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+.ctable th{color:var(--tx3);font-weight:500;width:66px;font-size:12px}
+.ctable td{font-weight:600;font-variant-numeric:tabular-nums}
+.ctable td small{display:block;color:var(--tx2);font-weight:400;font-size:11.5px}
+
+#totop{position:fixed;right:14px;bottom:78px;z-index:35;width:40px;height:40px;border-radius:14px;border:1px solid var(--line);background:var(--bg2);color:var(--tx2);font-size:16px;box-shadow:var(--shadow);display:none;cursor:pointer}
+#totop.show{display:block}
+#toast{position:fixed;left:50%;bottom:96px;transform:translate(-50%,10px);z-index:60;background:var(--card2);border:1px solid var(--line);color:var(--tx);font-size:13px;padding:9px 15px;border-radius:11px;opacity:0;pointer-events:none;transition:all .22s;box-shadow:var(--shadow);max-width:82vw;text-align:center}
+#toast.show{opacity:1;transform:translate(-50%,0)}
+
+/* 决策器 */
+.wrow{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 0;font-size:13px;border-bottom:1px solid var(--line)}
+.wrow:last-of-type{border-bottom:none}
+.wrow>span{color:var(--tx2)}
+.seg2{display:flex;gap:3px;background:var(--card2);border-radius:9px;padding:2px}
+.seg2 button{border:none;background:none;color:var(--tx3);font-size:11.5px;padding:5px 9px;border-radius:7px;cursor:pointer}
+.seg2 button.on{background:var(--card);color:var(--acc);font-weight:700;box-shadow:0 1px 3px rgba(0,0,0,.16)}
+.calc{width:100%;margin-top:12px}
+.srow{display:flex;gap:10px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--line)}
+.srow:last-child{border-bottom:none}
+.srank{flex:0 0 auto;width:22px;height:22px;border-radius:7px;background:var(--card2);color:var(--tx2);font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:2px}
+.srank.top{background:linear-gradient(135deg,var(--acc),var(--acc2));color:#fff}
+.smain{flex:1;min-width:0}
+.sname{font-size:14.5px;font-weight:650;line-height:1.35}
+.smeta{font-size:11.5px;color:var(--tx3);margin-top:2px;font-variant-numeric:tabular-nums}
+.sbar{height:5px;border-radius:99px;background:var(--card2);margin-top:7px;overflow:hidden}
+.sbar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.why{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.why span{font-size:10.5px;padding:1px 6px;border-radius:5px;background:rgba(61,220,151,.14);color:var(--good)}
+.sscore{flex:0 0 auto;font-size:16px;font-weight:800;color:var(--acc);font-variant-numeric:tabular-nums;margin-top:2px}
+.lockmini{border:1px solid var(--line);background:var(--card2);color:var(--tx2);border-radius:8px;padding:4px 8px;font-size:11px;cursor:pointer;margin-top:7px}
+:focus-visible{outline:2px solid var(--acc);outline-offset:2px;border-radius:8px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.skip{position:absolute;left:-9999px;top:0;background:var(--card);color:var(--tx);padding:10px 14px;border-radius:10px;border:1px solid var(--acc);z-index:99}
+.skip:focus{left:12px;top:12px}
+h1.brand{margin:0}
+@media print{
+  .top,.panel,.bar,#totop,details.tl,.mylock,.listhead button{display:none!important}
+  body{background:#fff;color:#000;padding:0}
+  .card{break-inside:avoid;border:1px solid #ccc;box-shadow:none}
+  .card::before{display:none}
+}
+.foot{margin-top:22px;color:var(--tx3);font-size:11.5px;line-height:1.9;border-top:1px solid var(--line);padding-top:13px}
+.foot b{color:var(--tx2);font-weight:600}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">跳到院校列表</a>
+
+<div class="top"><div class="wrap">
+  <h1 class="brand"><i aria-hidden="true"></i>单招择校助手<span class="ver">2026</span></h1>
+  <div class="count" id="topCount" aria-live="polite">—</div>
+</div></div>
+
+<main class="wrap" id="main">
+  <div class="stats">
+    <div class="stat g"><div class="v" id="sPub">62</div><div class="k">公办</div></div>
+    <div class="stat p"><div class="v" id="sPri">49</div><div class="k">民办</div></div>
+    <div class="stat a"><div class="v" id="sBen">17</div><div class="k">本科院校</div></div>
+  </div>
+
+  <div class="alert"><b>只能填一所学校。</b>4 月 21 日 9 时 — 22 日 18 时，一所 + 1~5 个专业志愿，最多改两次，过点不补。<br><b>公办学费中位 3700 元/年，民办 12000 元/年</b>，三年差出一台车钱。
+  <br><b>本科院校的单招专业也是专科</b>，毕业证是专科；本科层次职业学校同理，别被校名骗了。</div>
+
+  <div class="panel">
+    <div class="search" id="searchBox">
+      <span class="ico">🔍</span>
+      <input type="text" id="kw" placeholder="搜院校名、代码、城市" autocomplete="off">
+      <button class="clr" id="clr" aria-label="清空">✕</button>
+    </div>
+    <div class="seg" id="seg">
+      <button data-pub="0" class="on">全部</button>
+      <button data-pub="1" class="g">公办 62</button>
+      <button data-pub="2" class="p">民办 49</button>
+    </div>
+    <div class="seg" id="segLv">
+      <button data-lv="0" class="on">全部层次</button>
+      <button data-lv="1" class="a">本科院校 17</button>
+      <button data-lv="2">专科院校 94</button>
+    </div>
+    <div class="cities" id="cities"></div>
+    <div class="toggles">
+      <div class="tg" id="tDk">✓ 只收对口<span class="n" id="nDk"></span></div>
+      <div class="tg" id="tInfo">招信息安全<span class="n" id="nInfo"></span></div>
+      <div class="tg" id="tCheap">学费 ≤ 5000<span class="n" id="nCheap"></span></div>
+    </div>
+    <div class="toolrow">
+      <select id="sort">
+        <option value="dk">对口优先</option>
+        <option value="total">三年花费最低</option>
+        <option value="fee">学费最低</option>
+        <option value="city">按城市</option>
+        <option value="code">按院校代码</option>
+      </select>
+    </div>
+    <div class="actsum" id="actsum"></div>
+  </div>
+
+  <details class="tl">
+    <summary>专业：信息安全技术应用（510207）</summary>
+    <div class="tlbody">
+      <div class="tlrow"><span class="d">专业代码</span><span>510207（《职业教育专业目录（2021年）》）</span></div>
+      <div class="tlrow"><span class="d">专业大类</span><span>电子与信息大类（51）· 计算机类（5102）</span></div>
+      <div class="tlrow"><span class="d">学制层次</span><span>三年制高职专科</span></div>
+      <div class="tlrow"><span class="d">主要课程</span><span>计算机网络、操作系统安全、数据库安全、Web 安全、渗透测试、安全运维、密码学基础</span></div>
+      <div class="tlrow"><span class="d">对应岗位</span><span>网络安全运维、渗透测试、等级保护测评、安全服务工程师</span></div>
+      <div class="tlrow"><span class="d">进阶路径</span><span>专升本可接信息安全 / 网络工程；证书走 NISP、CISP-PTE、HCIA-Security</span></div>
+    </div>
+  </details>
+
+  <details class="tl">
+    <summary>2026 年单招关键时间</summary>
+    <div class="tlbody">
+      <div class="tlrow"><span class="d">3月15前</span><span>各校章程报省教育厅核定</span></div>
+      <div class="tlrow"><span class="d">4月21–22</span><span>网上填志愿（pzwb.haeea.cn）</span></div>
+      <div class="tlrow"><span class="d">4月26–30</span><span>各校自主考试</span></div>
+      <div class="tlrow"><span class="d">5月11前</span><span>拟录取名单报省考试院</span></div>
+      <div class="tlrow"><span class="d">5月20前</span><span>考试试卷报备</span></div>
+    </div>
+  </details>
+
+  <div class="mylock" id="mylock">
+    <div class="lb">我的志愿（只能填一所）</div>
+    <div class="nm" id="lockName">—</div>
+    <div class="ms" id="lockMeta"></div>
+    <button id="lockClear">解除锁定</button>
+  </div>
+
+  <details class="tl" id="decide">
+    <summary>帮我拿主意（打分排序）</summary>
+    <div class="tlbody">
+      <div id="weights">
+        <div class="wrow" data-w="dk"><span>确定收对口</span>
+          <div class="seg2"><button data-v="0">不看</button><button data-v="1">一般</button><button data-v="2" class="on">重要</button></div></div>
+        <div class="wrow" data-w="info"><span>招信息安全技术应用</span>
+          <div class="seg2"><button data-v="0">不看</button><button data-v="1">一般</button><button data-v="2" class="on">重要</button></div></div>
+        <div class="wrow" data-w="pub"><span>公办</span>
+          <div class="seg2"><button data-v="0">不看</button><button data-v="1" class="on">一般</button><button data-v="2">重要</button></div></div>
+        <div class="wrow" data-w="fee"><span>学费便宜</span>
+          <div class="seg2"><button data-v="0">不看</button><button data-v="1" class="on">一般</button><button data-v="2">重要</button></div></div>
+        <div class="wrow" data-w="dist"><span>离家近（博爱县出发）</span>
+          <div class="seg2"><button data-v="0">不看</button><button data-v="1" class="on">一般</button><button data-v="2">重要</button></div></div>
+      </div>
+      <button class="btn calc" id="calcBtn">算一算，给我排个序</button>
+    </div>
+  </details>
+
+  <div class="listhead">
+    <span id="resLabel" aria-live="polite">—</span>
+    <span style="display:flex;gap:14px">
+      <button id="copyBtn">复制清单</button>
+      <button id="reset">重置筛选</button>
+    </span>
+  </div>
+
+  <section id="list" aria-label="院校列表"></section>
+
+  <div class="foot">
+    <b>数据来源</b>：河南省教育厅《关于做好2026年河南省高职单招工作的通知》（教学〔2026〕34号）、河南单招信息平台院校名单、各校 2026 年招生章程原文（抓取 106 份）。<br>
+    <b>抓取时间</b>：2026-11-25。2027 年政策与名单会重新发布，本页仅作参考基线。<br>
+    <b>待核对</b>：19 所章程正文为附件未抓到，对口政策标「待核对」；办学性质按章程「办学性质/办学类型」字段，5 所另查官网补齐；专业标注来自公开资料交叉核对，以各校《招生计划》为准；学费为章程区间，可能含艺术类/中外合作。<br>
+    <b>三年花费</b>＝(学费+住宿费)×3，取章程区间下限；住宿费缺失时只算学费，仅供参考。
+    <div class="std" style="margin-top:10px;padding-top:10px;border-top:1px dashed var(--line)">
+      <b>标准与依据</b><br>
+      专业口径：《职业教育专业目录（2021年）》— 信息安全技术应用 <b>510207</b>，属电子与信息大类（51），学制三年<br>
+      招生口径：《河南省教育厅关于做好2026年河南省高职单招工作的通知》（教学〔2026〕34号）<br>
+      无障碍：参照 GB/T 37668-2019，正文对比度 ≥ 4.5:1、可键盘操作、触控目标 ≥ 36px、支持减少动效
+    </div>
+  </div>
+</main>
+
+<div class="bar" id="bar">
+  <div class="txt">已选 <b id="barN">0</b> 所</div>
+  <div style="display:flex;gap:8px">
+    <button class="btn ghost" id="barClear">清空</button>
+    <button class="btn" id="barOpen">对比</button>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h4><span id="sheetTitle">对比</span> <button id="mClose">✕</button></h4>
+    <div id="cmpBox" style="overflow-x:auto"><table class="ctable" id="ctable" aria-label="院校对比"></table></div>
+    <div id="scoreBox" style="display:none"></div>
+  </div>
+</div>
+
+<button id="totop" aria-label="回到顶部">↑</button>
+<div id="toast"></div>
+
+<script>
+const DB = [{"c":"6261","n":"河南职业技术学院","ct":"郑州","dk":1,"f":[2700,16000],"h":[600,600],"i":0,"u":"https://10824.gaokao.haedu.cn/policy/brochure/2026/0320/151091.html","p":1,"lv":2},{"c":"6277","n":"漯河职业技术学院","ct":"漯河","dk":1,"f":[3700,6000],"h":[500,700],"i":1,"u":"https://10835.gaokao.haedu.cn/policy/brochure/2026/0324/151189.html","p":1,"lv":2},{"c":"6275","n":"三门峡职业技术学院","ct":"三门峡","dk":1,"f":[4200,13600],"h":[900,900],"i":1,"u":"https://10842.gaokao.haedu.cn/policy/brochure/2026/0325/151201.html","p":1,"lv":2},{"c":"6252","n":"开封大学","ct":"开封","dk":1,"f":[3700,14000],"h":[750,750],"i":0,"u":"https://11069.gaokao.haedu.cn/policy/brochure/2026/0325/151203.html","p":1,"lv":2},{"c":"6272","n":"濮阳职业技术学院","ct":"濮阳","dk":1,"f":[3700,6000],"h":[700,800],"i":1,"u":"https://11787.gaokao.haedu.cn/policy/brochure/2026/0325/151206.html","p":1,"lv":2},{"c":"6213","n":"郑州电力高等专科学校","ct":"郑州","dk":2,"f":[4200,15000],"h":[900,900],"i":1,"u":"https://11828.gaokao.haedu.cn/policy/brochure/2026/0320/151094.html","p":1,"lv":2},{"c":"6235","n":"焦作师范高等专科学校","ct":"焦作","dk":0,"f":null,"h":null,"i":1,"u":"https://11967.gaokao.haedu.cn/policy/brochure/2026/0326/151262.html","p":1,"lv":2},{"c":"6258","n":"黄河水利职业技术大学","ct":"开封","dk":1,"f":null,"h":[800,800],"i":0,"u":"https://12058.gaokao.haedu.cn/policy/brochure/2026/0328/151351.html","p":1,"lv":1},{"c":"6276","n":"许昌职业技术学院","ct":"许昌","dk":1,"f":[3700,6000],"h":[800,1000],"i":1,"u":"https://12067.gaokao.haedu.cn/policy/brochure/2026/0320/151096.html","p":1,"lv":2},{"c":"6191","n":"河南工业和信息化职业学院","ct":"焦作","dk":2,"f":[3700,6000],"h":[600,800],"i":0,"u":"https://12581.gaokao.haedu.cn/policy/brochure/2026/0323/151121.html","p":1,"lv":2},{"c":"6192","n":"河南水利与环境职业学院","ct":"郑州","dk":1,"f":[3700,16000],"h":[600,800],"i":0,"u":"https://12582.gaokao.haedu.cn/policy/brochure/2026/0320/151099.html","p":1,"lv":2},{"c":"6278","n":"商丘职业技术学院","ct":"商丘","dk":1,"f":[3700,6000],"h":[900,900],"i":1,"u":"https://12745.gaokao.haedu.cn/policy/brochure/2026/0325/151210.html","p":1,"lv":2},{"c":"6180","n":"郑州科技学院","ct":"郑州","dk":1,"f":[16000,18000],"h":[1500,1500],"i":0,"u":"https://12746.gaokao.haedu.cn/policy/brochure/2026/0326/151308.html","p":2,"lv":1},{"c":"6175","n":"郑州工业应用技术学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":0,"u":"https://12747.gaokao.haedu.cn/policy/brochure/2026/0328/151349.html","p":2,"lv":1},{"c":"6279","n":"周口职业技术学院","ct":"周口","dk":1,"f":[4200,6000],"h":[800,800],"i":0,"u":"https://12750.gaokao.haedu.cn/policy/brochure/2026/0325/151215.html","p":1,"lv":2},{"c":"6280","n":"济源职业技术学院","ct":"济源","dk":0,"f":null,"h":null,"i":0,"u":"https://12768.gaokao.haedu.cn/policy/brochure/2026/0323/151135.html","p":1,"lv":2},{"c":"6273","n":"鹤壁职业技术学院","ct":"鹤壁","dk":1,"f":[3700,6000],"h":null,"i":1,"u":"https://12793.gaokao.haedu.cn/policy/brochure/2026/0325/151218.html","p":1,"lv":2},{"c":"6262","n":"河南工业职业技术大学","ct":"南阳","dk":1,"f":null,"h":[400,800],"i":0,"u":"https://12794.gaokao.haedu.cn/policy/brochure/2026/0323/151132.html","p":1,"lv":1},{"c":"6305","n":"郑州健康学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":0,"u":"https://12948.gaokao.haedu.cn/policy/brochure/2026/0324/151191.html","p":2,"lv":1},{"c":"6185","n":"郑州财经学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":0,"u":"https://13497.gaokao.haedu.cn/policy/brochure/2026/0326/151300.html","p":2,"lv":1},{"c":"6226","n":"黄河交通学院","ct":"焦作","dk":1,"f":[12900,12900],"h":[500,1500],"i":0,"u":"https://13498.gaokao.haedu.cn/policy/brochure/2026/0320/151109.html","p":2,"lv":1},{"c":"6205","n":"商丘工学院","ct":"商丘","dk":0,"f":[12000,13800],"h":[1500,1500],"i":0,"u":"https://13500.gaokao.haedu.cn/policy/brochure/2026/0326/151302.html","p":2,"lv":1},{"c":"6507","n":"安阳学院","ct":"安阳","dk":1,"f":[14500,16000],"h":[1400,1500],"i":0,"u":"https://13504.gaokao.haedu.cn/policy/brochure/2026/0326/151275.html","p":2,"lv":1},{"c":"6506","n":"郑州工商学院","ct":"焦作","dk":1,"f":null,"h":[1500,1500],"i":0,"u":"https://13507.gaokao.haedu.cn/policy/brochure/2026/0326/151277.html","p":2,"lv":1},{"c":"6268","n":"河南质量工程职业学院","ct":"平顶山","dk":0,"f":[3700,6000],"h":[700,1000],"i":1,"u":"https://13564.gaokao.haedu.cn/policy/brochure/2026/0325/151253.html","p":1,"lv":2},{"c":"6270","n":"郑州信息科技职业学院","ct":"郑州","dk":0,"f":null,"h":null,"i":1,"u":"https://13565.gaokao.haedu.cn/policy/brochure/2026/0330/151369.html","p":1,"lv":2},{"c":"6288","n":"信阳职业技术学院","ct":"信阳","dk":1,"f":[3700,6000],"h":[750,750],"i":1,"u":"https://13784.gaokao.haedu.cn/policy/brochure/2026/0325/151250.html","p":1,"lv":2},{"c":"6310","n":"嵩山少林武术职业学院","ct":"郑州","dk":1,"f":[7300,13000],"h":null,"i":0,"u":"https://13785.gaokao.haedu.cn/policy/brochure/2026/0402/151414.html","p":2,"lv":2},{"c":"6286","n":"郑州工业安全职业学院","ct":"郑州","dk":1,"f":[4200,6000],"h":[700,700],"i":1,"u":"https://13786.gaokao.haedu.cn/policy/brochure/2026/0325/151221.html","p":1,"lv":2},{"c":"6281","n":"河南经贸职业学院","ct":"郑州","dk":1,"f":[3700,14000],"h":[600,800],"i":1,"u":"https://13788.gaokao.haedu.cn/policy/brochure/2026/0323/151138.html","p":1,"lv":2},{"c":"6283","n":"河南交通职业技术学院","ct":"郑州","dk":1,"f":null,"h":[600,1000],"i":0,"u":"https://13789.gaokao.haedu.cn/policy/brochure/2026/0326/151314.html","p":1,"lv":2},{"c":"6282","n":"河南农业职业学院","ct":"郑州","dk":1,"f":[4200,4200],"h":[200,800],"i":1,"u":"https://13790.gaokao.haedu.cn/policy/brochure/2026/0325/151223.html","p":1,"lv":2},{"c":"6284","n":"郑州旅游职业学院","ct":"郑州","dk":1,"f":[3700,16000],"h":[800,800],"i":0,"u":"https://13791.gaokao.haedu.cn/policy/brochure/2026/0325/151226.html","p":1,"lv":2},{"c":"6285","n":"郑州职业技术学院","ct":"郑州","dk":0,"f":null,"h":null,"i":1,"u":"https://13792.gaokao.haedu.cn/policy/brochure/2026/0324/151166.html","p":1,"lv":2},{"c":"6186","n":"河南信息统计职业学院","ct":"郑州","dk":1,"f":[4200,4200],"h":[400,600],"i":1,"u":"https://13885.gaokao.haedu.cn/policy/brochure/2026/0328/151340.html","p":1,"lv":2},{"c":"6188","n":"河南林业职业学院","ct":"洛阳","dk":1,"f":[3700,12000],"h":[400,800],"i":1,"u":"https://13889.gaokao.haedu.cn/policy/brochure/2026/0330/151374.html","p":1,"lv":2},{"c":"6289","n":"河南工业贸易职业学院","ct":"郑州","dk":0,"f":null,"h":null,"i":0,"u":"https://13936.gaokao.haedu.cn/policy/brochure/2026/0325/151229.html","p":1,"lv":2},{"c":"6200","n":"商丘学院","ct":"商丘","dk":1,"f":null,"h":null,"i":0,"u":"https://14003.gaokao.haedu.cn/policy/brochure/2026/0323/151156.html","p":2,"lv":1},{"c":"6303","n":"郑州电力职业技术学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":1,"u":"https://14062.gaokao.haedu.cn/policy/brochure/2026/0325/151255.html","p":2,"lv":2},{"c":"6296","n":"漯河食品工程职业大学","ct":"漯河","dk":1,"f":[3700,12500],"h":[1400,1400],"i":1,"u":"https://14233.gaokao.haedu.cn/policy/brochure/2026/0326/151306.html","p":2,"lv":1},{"c":"6295","n":"郑州城市职业学院","ct":"郑州","dk":1,"f":null,"h":[1400,1500],"i":0,"u":"https://14235.gaokao.haedu.cn/policy/brochure/2026/0326/151264.html","p":2,"lv":2},{"c":"6292","n":"安阳职业技术学院","ct":"安阳","dk":1,"f":[3700,6000],"h":[600,800],"i":0,"u":"https://14243.gaokao.haedu.cn/policy/brochure/2026/0325/151234.html","p":1,"lv":2},{"c":"6291","n":"新乡职业技术学院","ct":"新乡","dk":1,"f":[3700,6000],"h":[500,960],"i":1,"u":"https://14245.gaokao.haedu.cn/policy/brochure/2026/0326/151266.html","p":1,"lv":2},{"c":"6293","n":"驻马店职业技术学院","ct":"驻马店","dk":1,"f":[4200,4800],"h":[700,800],"i":1,"u":"https://14251.gaokao.haedu.cn/policy/brochure/2026/0326/151271.html","p":1,"lv":2},{"c":"6299","n":"焦作工贸职业学院","ct":"焦作","dk":1,"f":null,"h":[1300,1500],"i":1,"u":"https://14300.gaokao.haedu.cn/policy/brochure/2026/0401/151400.html","p":2,"lv":2},{"c":"6297","n":"郑州理工职业学院","ct":"郑州","dk":1,"f":[13000,13000],"h":[1500,1500],"i":0,"u":"https://14302.gaokao.haedu.cn/policy/brochure/2026/0324/151171.html","p":2,"lv":2},{"c":"6298","n":"郑州信息工程职业学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":1,"u":"https://14303.gaokao.haedu.cn/policy/brochure/2026/0326/151273.html","p":2,"lv":2},{"c":"6300","n":"长垣烹饪职业技术学院","ct":"新乡","dk":1,"f":null,"h":[1400,1400],"i":0,"u":"https://14305.gaokao.haedu.cn/policy/brochure/2026/0325/151238.html","p":2,"lv":2},{"c":"6316","n":"开封文化艺术职业学院","ct":"开封","dk":1,"f":[3700,6000],"h":[500,600],"i":1,"u":"https://14306.gaokao.haedu.cn/policy/brochure/2026/0330/151377.html","p":1,"lv":2},{"c":"6266","n":"河南应用技术职业学院","ct":"郑州","dk":1,"f":[2900,5280],"h":[400,1000],"i":0,"u":"https://14307.gaokao.haedu.cn/policy/brochure/2026/0320/151089.html","p":1,"lv":2},{"c":"6290","n":"河南艺术职业学院","ct":"郑州","dk":1,"f":[3700,18000],"h":[600,800],"i":0,"u":"https://14308.gaokao.haedu.cn/policy/brochure/2026/0325/151241.html","p":1,"lv":2},{"c":"6382","n":"河南机电职业学院","ct":"郑州","dk":0,"f":null,"h":null,"i":1,"u":"https://14348.gaokao.haedu.cn/policy/brochure/2026/0323/151125.html","p":1,"lv":2},{"c":"6385","n":"许昌电气职业学院","ct":"许昌","dk":0,"f":null,"h":null,"i":0,"u":"","p":1,"lv":2},{"c":"6388","n":"信阳涉外职业技术学院","ct":"信阳","dk":1,"f":null,"h":[1000,1400],"i":0,"u":"https://14351.gaokao.haedu.cn/policy/brochure/2026/0320/151087.html","p":2,"lv":2},{"c":"6387","n":"鹤壁汽车工程职业学院","ct":"鹤壁","dk":1,"f":null,"h":[1000,1200],"i":1,"u":"https://14352.gaokao.haedu.cn/policy/brochure/2026/0325/151257.html","p":2,"lv":2},{"c":"6389","n":"南阳职业学院","ct":"南阳","dk":1,"f":null,"h":[1300,1300],"i":1,"u":"https://14353.gaokao.haedu.cn/policy/brochure/2026/0320/151082.html","p":2,"lv":2},{"c":"6386","n":"郑州商贸旅游职业学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":1,"u":"https://14380.gaokao.haedu.cn/policy/brochure/2026/0323/151127.html","p":2,"lv":2},{"c":"6381","n":"河南推拿职业学院","ct":"洛阳","dk":1,"f":[3700,4800],"h":[600,600],"i":0,"u":"https://14382.gaokao.haedu.cn/policy/brochure/2026/0327/151330.html","p":1,"lv":2},{"c":"6384","n":"洛阳职业技术学院","ct":"洛阳","dk":1,"f":[3700,12000],"h":[400,1200],"i":1,"u":"https://14383.gaokao.haedu.cn/policy/brochure/2026/0323/151129.html","p":1,"lv":2},{"c":"6390","n":"郑州黄河护理职业学院","ct":"郑州","dk":1,"f":[12000,14000],"h":[1000,1500],"i":0,"u":"https://14405.gaokao.haedu.cn/policy/brochure/2026/0324/151173.html","p":2,"lv":2},{"c":"6379","n":"郑州财税金融职业学院","ct":"郑州","dk":0,"f":null,"h":null,"i":1,"u":"https://14478.gaokao.haedu.cn/policy/brochure/2026/0320/151101.html","p":1,"lv":2},{"c":"6380","n":"南阳农业职业学院","ct":"南阳","dk":1,"f":[4200,6000],"h":[550,700],"i":0,"u":"https://14479.gaokao.haedu.cn/policy/brochure/2026/0324/151176.html","p":1,"lv":2},{"c":"6391","n":"洛阳科技职业学院（民办）","ct":"洛阳","dk":0,"f":null,"h":null,"i":0,"u":"https://14480.gaokao.haedu.cn/policy/brochure/2026/0330/151380.html","p":2,"lv":2},{"c":"6256","n":"焦作大学","ct":"焦作","dk":0,"f":[4200,6000],"h":[600,800],"i":0,"u":"https://11522.gaokao.haedu.cn/policy/brochure/2026/0324/151161.html","p":1,"lv":2},{"c":"6393","n":"三门峡社会管理职业学院","ct":"三门峡","dk":1,"f":[4200,6000],"h":[800,800],"i":1,"u":"https://14606.gaokao.haedu.cn/policy/brochure/2026/0324/151179.html","p":1,"lv":2},{"c":"6320","n":"河南测绘职业学院","ct":"郑州","dk":1,"f":[4200,4200],"h":[600,800],"i":1,"u":"https://14608.gaokao.haedu.cn/policy/brochure/2026/0325/151236.html","p":1,"lv":2},{"c":"6392","n":"鹤壁能源化工职业学院","ct":"鹤壁","dk":1,"f":[4200,4200],"h":[600,950],"i":0,"u":"https://14529.gaokao.haedu.cn/policy/brochure/2026/0319/151074.html","p":1,"lv":2},{"c":"6232","n":"驻马店幼儿师范高等专科学校","ct":"驻马店","dk":0,"f":null,"h":null,"i":1,"u":"https://14598.gaokao.haedu.cn/policy/brochure/2026/0326/151286.html","p":1,"lv":2},{"c":"6541","n":"信阳航空职业学院","ct":"信阳","dk":1,"f":null,"h":[1500,1500],"i":1,"u":"https://14634.gaokao.haedu.cn/policy/brochure/2026/0328/151355.html","p":2,"lv":2},{"c":"6538","n":"郑州卫生健康职业学院","ct":"郑州","dk":1,"f":[4200,4200],"h":[400,400],"i":0,"u":"https://14635.gaokao.haedu.cn/policy/brochure/2026/0323/151141.html","p":1,"lv":2},{"c":"6540","n":"河南地矿职业学院","ct":"郑州","dk":1,"f":[3700,6000],"h":null,"i":1,"u":"https://14637.gaokao.haedu.cn/policy/brochure/2026/0326/151288.html","p":1,"lv":2},{"c":"6313","n":"平顶山职业技术学院","ct":"平顶山","dk":1,"f":[3700,6000],"h":[400,400],"i":1,"u":"https://50709.gaokao.haedu.cn/policy/brochure/2026/0326/151269.html","p":1,"lv":2},{"c":"6003","n":"郑州西亚斯学院","ct":"郑州","dk":1,"f":null,"h":[2100,2500],"i":0,"u":"https://14654.gaokao.haedu.cn/policy/brochure/2026/0328/151347.html","p":2,"lv":1},{"c":"6309","n":"郑州电子信息职业技术学院","ct":"郑州","dk":1,"f":[12000,12000],"h":[1500,1500],"i":0,"u":"https://13783.gaokao.haedu.cn/policy/brochure/2026/0324/151164.html","p":2,"lv":2},{"c":"6301","n":"许昌陶瓷职业学院","ct":"许昌","dk":1,"f":[10600,11900],"h":[1200,1200],"i":0,"u":"https://14301.gaokao.haedu.cn/policy/brochure/2026/0324/151169.html","p":2,"lv":2},{"c":"5999","n":"郑州亚欧交通职业学院（中外合作办学）","ct":"郑州","dk":1,"f":null,"h":[400,400],"i":0,"u":"https://14685.gaokao.haedu.cn/policy/brochure/2026/0328/151344.html","p":1,"lv":2},{"c":"6269","n":"河南建筑职业技术学院","ct":"郑州","dk":0,"f":null,"h":null,"i":1,"u":"","p":1,"lv":2},{"c":"6359","n":"林州建筑职业技术学院","ct":"安阳","dk":1,"f":null,"h":[1500,1500],"i":1,"u":"https://14717.gaokao.haedu.cn/policy/brochure/2026/0326/151279.html","p":2,"lv":2},{"c":"6130","n":"黄河科技学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":0,"u":"https://11834.gaokao.haedu.cn/policy/brochure/2026/0327/151337.html","p":2,"lv":1},{"c":"6353","n":"河南女子职业学院","ct":"郑州","dk":1,"f":[3700,6000],"h":[600,600],"i":1,"u":"https://14711.gaokao.haedu.cn/policy/brochure/2026/0330/151383.html","p":1,"lv":2},{"c":"6357","n":"兰考三农职业学院","ct":"开封","dk":0,"f":[3700,6000],"h":[950,950],"i":0,"u":"https://14715.gaokao.haedu.cn/policy/brochure/2026/0327/151334.html","p":1,"lv":2},{"c":"6356","n":"南阳科技职业学院","ct":"南阳","dk":1,"f":[3700,6000],"h":[800,800],"i":1,"u":"https://14714.gaokao.haedu.cn/policy/brochure/2026/0330/151386.html","p":1,"lv":2},{"c":"6358","n":"汝州职业技术学院","ct":"平顶山","dk":1,"f":[3700,6000],"h":[600,900],"i":1,"u":"https://14716.gaokao.haedu.cn/policy/brochure/2026/0325/151208.html","p":1,"lv":2},{"c":"6361","n":"郑州轨道工程职业学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":0,"u":"https://14719.gaokao.haedu.cn/policy/brochure/2026/0320/151085.html","p":2,"lv":2},{"c":"6360","n":"郑州电子商务职业学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":1,"u":"https://14718.gaokao.haedu.cn/policy/brochure/2026/0324/151181.html","p":2,"lv":2},{"c":"6362","n":"郑州体育职业学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":0,"u":"https://14720.gaokao.haedu.cn/policy/brochure/2026/0324/151183.html","p":2,"lv":2},{"c":"6366","n":"郑州城建职业学院","ct":"郑州","dk":1,"f":null,"h":[900,1500],"i":1,"u":"https://14753.gaokao.haedu.cn/policy/brochure/2026/0325/151246.html","p":2,"lv":2},{"c":"6367","n":"郑州医药健康职业学院","ct":"郑州","dk":1,"f":[10000,10000],"h":[1000,1500],"i":0,"u":"https://14754.gaokao.haedu.cn/policy/brochure/2026/0326/151281.html","p":2,"lv":2},{"c":"6233","n":"安阳幼儿师范高等专科学校","ct":"安阳","dk":1,"f":[3700,6000],"h":[800,800],"i":0,"u":"https://14392.gaokao.haedu.cn/policy/brochure/2026/0326/151283.html","p":1,"lv":2},{"c":"6363","n":"洛阳文化旅游职业学院","ct":"洛阳","dk":1,"f":[3700,3700],"h":[700,700],"i":1,"u":"https://14750.gaokao.haedu.cn/policy/brochure/2026/0324/151185.html","p":1,"lv":2},{"c":"6365","n":"信阳艺术职业学院","ct":"信阳","dk":1,"f":[3700,6000],"h":[800,1000],"i":0,"u":"https://14752.gaokao.haedu.cn/policy/brochure/2026/0320/151104.html","p":1,"lv":2},{"c":"6512","n":"中原科技学院","ct":"郑州","dk":0,"f":null,"h":null,"i":1,"u":"","p":2,"lv":1},{"c":"6015","n":"河南中医药大学","ct":"郑州","dk":0,"f":null,"h":null,"i":0,"u":"https://10471.gaokao.haedu.cn/policy/brochure/2026/0317/151059.html","p":1,"lv":1},{"c":"6312","n":"平顶山文化艺术职业学院","ct":"平顶山","dk":0,"f":null,"h":null,"i":0,"u":"","p":2,"lv":2},{"c":"6368","n":"南阳工艺美术职业学院","ct":"南阳","dk":1,"f":[4200,6000],"h":[570,570],"i":0,"u":"https://14789.gaokao.haedu.cn/policy/brochure/2026/0323/151145.html","p":1,"lv":2},{"c":"6370","n":"濮阳科技职业学院","ct":"濮阳","dk":1,"f":[3700,6000],"h":[440,440],"i":0,"u":"https://14790.gaokao.haedu.cn/policy/brochure/2026/0320/151118.html","p":1,"lv":2},{"c":"6371","n":"周口理工职业学院","ct":"周口","dk":0,"f":null,"h":null,"i":0,"u":"","p":1,"lv":2},{"c":"6372","n":"焦作新材料职业学院","ct":"焦作","dk":1,"f":[9800,10800],"h":[1200,1500],"i":0,"u":"https://14793.gaokao.haedu.cn/policy/brochure/2026/0324/151199.html","p":2,"lv":2},{"c":"6373","n":"洛阳商业职业学院","ct":"洛阳","dk":1,"f":[10800,14800],"h":[1000,1000],"i":1,"u":"https://14795.gaokao.haedu.cn/policy/brochure/2026/0323/151150.html","p":2,"lv":2},{"c":"6369","n":"开封职业学院","ct":"开封","dk":1,"f":[13000,15000],"h":[1500,1500],"i":0,"u":"https://14794.gaokao.haedu.cn/policy/brochure/2026/0402/151417.html","p":2,"lv":2},{"c":"6374","n":"郑州软件职业技术学院","ct":"郑州","dk":1,"f":[3000,3700],"h":[1500,1500],"i":1,"u":"https://14796.gaokao.haedu.cn/policy/brochure/2026/0325/151213.html","p":2,"lv":2},{"c":"6375","n":"郑州智能科技职业学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":1,"u":"https://14797.gaokao.haedu.cn/policy/brochure/2026/0328/151360.html","p":2,"lv":2},{"c":"6376","n":"郑州食品工程职业学院","ct":"郑州","dk":1,"f":null,"h":[1200,1300],"i":0,"u":"https://14812.gaokao.haedu.cn/policy/brochure/2026/0328/151367.html","p":2,"lv":2},{"c":"6377","n":"郑州汽车工程职业学院","ct":"郑州","dk":1,"f":null,"h":[1500,1500],"i":0,"u":"https://14813.gaokao.haedu.cn/policy/brochure/2026/0320/151107.html","p":2,"lv":2},{"c":"6231","n":"郑州幼儿师范高等专科学校","ct":"郑州","dk":1,"f":null,"h":[600,600],"i":0,"u":"https://14391.gaokao.haedu.cn/policy/brochure/2026/0401/151402.html","p":1,"lv":2},{"c":"6334","n":"周口城市职业学院","ct":"周口","dk":1,"f":null,"h":[500,1200],"i":0,"u":"https://14864.gaokao.haedu.cn/policy/brochure/2026/0326/151292.html","p":2,"lv":2},{"c":"6503","n":"新乡工程学院","ct":"新乡","dk":1,"f":[15000,16000],"h":[1500,1500],"i":0,"u":"https://13506.gaokao.haedu.cn/policy/brochure/2026/0324/151195.html","p":2,"lv":1},{"c":"6542","n":"开封工程职业学院","ct":"开封","dk":1,"f":[12000,12000],"h":null,"i":0,"u":"http://14929.gaokao.haedu.cn/policy/brochure/2026/0324/151187.html","p":2,"lv":2},{"c":"6543","n":"开封智慧健康职业学院","ct":"开封","dk":1,"f":[13000,13000],"h":[1000,1500],"i":0,"u":"http://14930.gaokao.haedu.cn/policy/brochure/2026/0326/151294.html","p":2,"lv":2},{"c":"6544","n":"周口智慧能源职业学院","ct":"周口","dk":1,"f":null,"h":[1200,1200],"i":0,"u":"http://14931.gaokao.haedu.cn/policy/brochure/2026/0323/151152.html","p":2,"lv":2},{"c":"6545","n":"平顶山科技职业学院","ct":"平顶山","dk":1,"f":[9000,12000],"h":[1000,1000],"i":0,"u":"http://14932.gaokao.haedu.cn/policy/brochure/2026/0401/151405.html","p":2,"lv":2}];
+const DK = {1:{t:"收对口",c:"t-ok"},2:{t:"不收对口",c:"t-no"},0:{t:"对口待核对",c:"t-mid"}};
+const $ = id => document.getElementById(id);
+const store = {
+  get(k,def){ try{ const v = localStorage.getItem(k); return v ? JSON.parse(v) : def; }catch(e){ return def; } },
+  set(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+};
+let picked = store.get("dz_pick", []).filter(c => DB.some(d => d.c === c)).slice(0,3);
+let lockCode = store.get("dz_lock", null);
+if(lockCode && !DB.some(d => d.c === lockCode)) lockCode = null;
+let st = { city:"全部", kw:"", pub:0, lv:0, dk:false, info:false, cheap:false, sort:"dk" };
+
+const CITIES = ["全部", ...Array.from(new Set(DB.map(d => d.ct))).sort()];
+const KM = {焦作:40,济源:100,新乡:110,郑州:130,洛阳:150,鹤壁:170,开封:190,安阳:190,许昌:200,平顶山:210,濮阳:250,漯河:270,周口:290,三门峡:310,商丘:350,驻马店:350,南阳:380,信阳:470};
+const kmOf = d => KM[d.ct] || null;
+
+/* ---- 计算 ---- */
+function total3(d){
+  if(!d.f) return null;
+  const h = d.h || [0,0];
+  return [(d.f[0]+h[0])*3, (d.f[1]+h[1])*3];
+}
+const wan = v => (v/10000).toFixed(1);
+function totalTxt(d){
+  const t = total3(d);
+  if(!t) return "";
+  return t[0]===t[1] ? `三年≈${wan(t[0])}万` : `三年 ${wan(t[0])}–${wan(t[1])}万`;
+}
+function feeTxt(d){
+  if(!d.f) return '<span style="color:var(--tx3)">学费待核对</span>';
+  return '<span class="money">学费 '+(d.f[0]===d.f[1]?d.f[0]:d.f[0]+"–"+d.f[1])+'</span>';
+}
+
+/* ---- 筛选 ---- */
+function match(d){
+  if(st.city!=="全部" && d.ct!==st.city) return false;
+  if(st.pub && d.p!==st.pub) return false;
+  if(st.lv && d.lv!==st.lv) return false;
+  if(st.kw){ const k = st.kw.trim().toLowerCase(); if(!(d.n+d.c+d.ct).toLowerCase().includes(k)) return false; }
+  if(st.dk && d.dk!==1) return false;
+  if(st.info && d.i!==1) return false;
+  if(st.cheap && (!d.f || d.f[0] > 5000)) return false;
+  return true;
+}
+function sortBy(a,b){
+  if(st.sort==="fee" || st.sort==="total"){
+    const val = d => st.sort==="fee" ? (d.f?d.f[0]:Infinity) : (total3(d)?total3(d)[0]:Infinity);
+    const x = val(a), y = val(b);
+    if(x!==y) return x-y;
+  } else if(st.sort==="code"){
+    return a.c.localeCompare(b.c);
+  } else if(st.sort==="city"){
+    if(a.ct!==b.ct) return a.ct==="焦作" ? -1 : (b.ct==="焦作" ? 1 : a.ct.localeCompare(b.ct));
+  } else {
+    const r = {1:0,0:1,2:2};
+    if(r[a.dk]!==r[b.dk]) return r[a.dk]-r[b.dk];
+    if(a.ct!==b.ct) return a.ct==="焦作" ? -1 : (b.ct==="焦作" ? 1 : a.ct.localeCompare(b.ct));
+  }
+  return a.n.localeCompare(b.n,"zh");
+}
+
+/* ---- 渲染 ---- */
+function cardHTML(d){
+  const lv = DK[d.dk];
+  const on = picked.includes(d.c), lk = lockCode === d.c;
+  return `<article class="card dk${d.dk}${lk?" locked":""}">
+    <div class="ctop">
+      <div class="cleft">
+        <span class="avatar">${d.n.slice(0,1)}</span>
+        <div><div class="cname">${d.n}</div><div class="csub">代码 ${d.c} · ${d.ct}</div></div>
+      </div>
+      <div class="acts">
+        <button class="act lock${lk?" on":""}" data-lock="${d.c}" aria-label="锁定为我的志愿">${lk?"★":"☆"}</button>
+        <button class="act pick${on?" on":""}" data-pick="${d.c}" aria-label="加入对比">${on?"✓":"＋"}</button>
+      </div>
+    </div>
+    <div class="tags">
+      <span class="tag ${d.p===1?"t-pub":"t-pri"}">${d.p===1?"公办":"民办"}</span>
+      ${d.lv===1?'<span class="tag t-ben">本科院校</span>':''}
+      <span class="tag ${lv.c}">${lv.t}</span>
+      ${d.i?'<span class="tag t-info">招信息安全</span>':''}
+    </div>
+    <div class="facts">
+      ${feeTxt(d)}
+      ${d.h?`<span>住宿 ${d.h[0]}${d.h[1]!==d.h[0]?"–"+d.h[1]:""}</span>`:""}
+      ${totalTxt(d)?`<span class="tot">${totalTxt(d)}</span>`:""}
+      ${kmOf(d)?`<span>离家约 ${kmOf(d)} km</span>`:""}
+      ${d.u?`<a href="${d.u}" target="_blank" rel="noopener">章程</a>`:""}
+    </div>
+  </article>`;
+}
+function render(){
+  const L = DB.filter(match).sort(sortBy);
+  $("list").innerHTML = L.length
+    ? L.map(cardHTML).join("")
+    : '<div class="empty"><span class="em">🗂</span>这个组合下没有院校<br><span style="font-size:12px;opacity:.7">试着放宽条件，或点下面这颗按钮</span><br><button class="btn ghost" data-reset2 style="margin-top:12px">重置筛选</button></div>';
+  $("resLabel").textContent = `共 ${L.length} 所`;
+  $("topCount").innerHTML = `<b>${L.length}</b> / 111 所`;
+  $("nDk").textContent = DB.filter(d=>d.dk===1).length;
+  $("nInfo").textContent = DB.filter(d=>d.i===1).length;
+  $("nCheap").textContent = DB.filter(d=>d.f&&d.f[0]<=5000).length;
+  $("sPub").textContent = DB.filter(d=>d.p===1).length;
+  $("sPri").textContent = DB.filter(d=>d.p===2).length;
+  $("sBen").textContent = DB.filter(d=>d.lv===1).length;
+  renderActSum();
+}
+function renderActSum(){
+  const a = [];
+  if(st.city!=="全部") a.push(["city","城市："+st.city]);
+  if(st.pub) a.push(["pub", st.pub===1?"只看公办":"只看民办"]);
+  if(st.lv) a.push(["lv", st.lv===1?"只看本科院校":"只看专科院校"]);
+  if(st.kw) a.push(["kw","搜索："+st.kw]);
+  if(st.dk) a.push(["dk","只收对口"]);
+  if(st.info) a.push(["info","招信息安全"]);
+  if(st.cheap) a.push(["cheap","学费≤5000"]);
+  $("actsum").innerHTML = a.map(([k,t])=>`<span class="achip" data-clear="${k}">${t} <b>✕</b></span>`).join("");
+}
+function renderLock(){
+  const d = lockCode ? DB.find(x=>x.c===lockCode) : null;
+  $("mylock").classList.toggle("show", !!d);
+  if(!d) return;
+  $("lockName").textContent = d.n;
+  $("lockMeta").textContent = `${d.p===1?"公办":"民办"}${d.lv===1?"·本科院校":""} · ${d.ct}${kmOf(d)?"（约"+kmOf(d)+"km）":""} · ${DK[d.dk].t}${d.i?" · 招信息安全":""}${totalTxt(d)?" · "+totalTxt(d):""}`;
+}
+function renderBar(){
+  $("bar").classList.toggle("show", picked.length > 0);
+  $("barN").textContent = picked.length;
+}
+function syncToggles(){
+  $("tDk").setAttribute("aria-pressed", st.dk);
+  $("tInfo").setAttribute("aria-pressed", st.info);
+  $("tCheap").setAttribute("aria-pressed", st.cheap);
+  $("tDk").classList.toggle("on", st.dk);
+  $("tInfo").classList.toggle("on", st.info);
+  $("tCheap").classList.toggle("on", st.cheap);
+  $("searchBox").classList.toggle("has", !!st.kw);
+}
+
+/* ---- 事件 ---- */
+$("cities").addEventListener("click", e => {
+  const b = e.target.closest(".city"); if(!b) return;
+  st.city = b.dataset.city;
+  document.querySelectorAll(".city").forEach(x => { const on = x.dataset.city === st.city; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on); });
+  render();
+});
+$("segLv").addEventListener("click", e => {
+  const b = e.target.closest("[data-lv]"); if(!b) return;
+  st.lv = Number(b.dataset.lv);
+  document.querySelectorAll("#segLv button").forEach(x => { const on = Number(x.dataset.lv) === st.lv; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on); });
+  render();
+});
+$("seg").addEventListener("click", e => {
+  const b = e.target.closest("[data-pub]"); if(!b) return;
+  st.pub = Number(b.dataset.pub);
+  document.querySelectorAll("#seg button").forEach(x => { const on = Number(x.dataset.pub) === st.pub; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on); });
+  render();
+});
+let kwTimer;
+$("kw").addEventListener("input", e => {
+  const v = e.target.value;
+  clearTimeout(kwTimer);
+  kwTimer = setTimeout(() => { st.kw = v; syncToggles(); render(); }, 120);
+});
+$("clr").addEventListener("click", () => { st.kw=""; $("kw").value=""; syncToggles(); render(); $("kw").focus(); });
+$("tDk").addEventListener("click", () => { st.dk=!st.dk; syncToggles(); render(); });
+$("tInfo").addEventListener("click", () => { st.info=!st.info; syncToggles(); render(); });
+$("tCheap").addEventListener("click", () => { st.cheap=!st.cheap; syncToggles(); render(); });
+$("sort").addEventListener("change", e => { st.sort = e.target.value; render(); });
+$("actsum").addEventListener("click", e => {
+  const b = e.target.closest("[data-clear]"); if(!b) return;
+  const k = b.dataset.clear;
+  if(k==="city"){ st.city="全部"; document.querySelectorAll(".city").forEach(x=>x.classList.toggle("on",x.dataset.city==="全部")); }
+  if(k==="pub"){ st.pub=0; document.querySelectorAll("#seg button").forEach(x=>x.classList.toggle("on",x.dataset.pub==="0")); }
+  if(k==="lv"){ st.lv=0; document.querySelectorAll("#segLv button").forEach(x=>x.classList.toggle("on",x.dataset.lv==="0")); }
+  if(k==="kw"){ st.kw=""; $("kw").value=""; }
+  if(k==="dk") st.dk=false;
+  if(k==="info") st.info=false;
+  if(k==="cheap") st.cheap=false;
+  syncToggles(); render();
+});
+$("reset").addEventListener("click", () => {
+  st = { city:"全部", kw:"", pub:0, lv:0, dk:false, info:false, cheap:false, sort:"dk" };
+  $("kw").value=""; $("sort").value="dk";
+  document.querySelectorAll(".city").forEach(x => x.classList.toggle("on", x.dataset.city === "全部"));
+  document.querySelectorAll("#seg button").forEach(x => x.classList.toggle("on", x.dataset.pub === "0"));
+  document.querySelectorAll("#segLv button").forEach(x => x.classList.toggle("on", x.dataset.lv === "0"));
+  syncToggles(); render();
+});
+$("list").addEventListener("click", e => {
+  const pk = e.target.closest("[data-pick]");
+  if(pk){
+    const c = pk.dataset.pick;
+    if(picked.includes(c)) picked = picked.filter(x => x !== c);
+    else if(picked.length >= 3) return toast("最多对比 3 所");
+    else picked.push(c);
+    store.set("dz_pick", picked);
+    pk.classList.toggle("on", picked.includes(c));
+    pk.textContent = picked.includes(c) ? "✓" : "＋";
+    renderBar();
+    return;
+  }
+  const lk = e.target.closest("[data-lock]");
+  if(lk){
+    const c = lk.dataset.lock;
+    if(lockCode === c){ lockCode = null; toast("已解除锁定"); }
+    else { lockCode = c; toast("已锁定：" + (DB.find(x=>x.c===c)||{}).n); }
+    store.set("dz_lock", lockCode);
+    render(); renderLock();
+  }
+});
+$("list").addEventListener("click", e => {
+  if(e.target.closest("[data-reset2]")) $("reset").click();
+});
+$("lockClear").addEventListener("click", () => { lockCode=null; store.set("dz_lock",null); render(); renderLock(); });
+/* 权重 */
+const W = { dk:2, info:2, pub:1, fee:1, dist:1 };
+$("weights").addEventListener("click", e => {
+  const b = e.target.closest("[data-v]"); if(!b) return;
+  const row = b.closest("[data-w]");
+  W[row.dataset.w] = Number(b.dataset.v);
+  row.querySelectorAll("[data-v]").forEach(x => x.classList.toggle("on", x === b));
+});
+function norm(d, w){
+  const tot = total3(d);
+  const fees = DB.map(x=>total3(x)).filter(Boolean).map(t=>t[0]);
+  const fmin = Math.min(...fees), fmax = Math.max(...fees);
+  const kms = DB.map(kmOf).filter(Boolean);
+  const kmin = Math.min(...kms), kmax = Math.max(...kms);
+  const s = {
+    dk: d.dk===1 ? 1 : (d.dk===0 ? 0.4 : 0),
+    info: d.i===1 ? 1 : 0,
+    pub: d.p===1 ? 1 : 0,
+    fee: tot ? 1 - ((tot[0]-fmin)/Math.max(1,fmax-fmin)) : 0,
+    dist: kmOf(d) ? 1 - ((kmOf(d)-kmin)/Math.max(1,kmax-kmin)) : 0.5
+  };
+  let sum = 0, wsum = 0;
+  for(const k in W){ sum += (W[k]||0) * s[k]; wsum += (W[k]||0); }
+  return { pct: wsum ? Math.round(sum/wsum*100) : 0, s };
+}
+function openScore(){
+  const rows = DB.filter(d => d.dk !== 2).map(d => ({ d, ...norm(d) }))
+    .sort((a,b) => b.pct - a.pct || a.d.n.localeCompare(b.d.n,"zh")).slice(0,8);
+  const why = (d,s) => [["dk","对口确认"],["info","有信息安全"],["pub","公办"],["fee","学费低"],["dist","离家近"]]
+    .filter(([k]) => W[k] >= 1 && s[k] >= 0.7).map(([,t]) => `<span>${t}</span>`).join("");
+  $("scoreBox").innerHTML = rows.map((r,i) => `<div class="srow">
+      <div class="srank${i===0?" top":""}">${i+1}</div>
+      <div class="smain">
+        <div class="sname">${r.d.n}</div>
+        <div class="smeta">${r.d.p===1?"公办":"民办"}${r.d.lv===1?"（本科院校）":""} · ${r.d.ct} · ${DK[r.d.dk].t}${r.d.i?" · 招信息安全":""}${r.f?(" · "+feeTxt(r.d).replace(/<[^>]+>/g,"")):""}</div>
+        <div class="sbar"><i style="width:${r.pct}%"></i></div>
+        <div class="why">${why(r.d,r.s)}</div>
+        <button class="lockmini" data-lockmini="${r.d.c}">设为我的志愿</button>
+      </div>
+      <div class="sscore">${r.pct}</div>
+    </div>`).join("") || '<div class="empty">没有可排的院校</div>';
+  $("sheetTitle").textContent = "打分排序";
+  $("cmpBox").style.display = "none";
+  $("scoreBox").style.display = "block";
+  $("modal").classList.add("show");
+}
+$("calcBtn").addEventListener("click", openScore);
+$("scoreBox").addEventListener("click", e => {
+  const b = e.target.closest("[data-lockmini]"); if(!b) return;
+  lockCode = b.dataset.lockmini;
+  store.set("dz_lock", lockCode);
+  $("modal").classList.remove("show");
+  render(); renderLock(); toast("已锁定：" + (DB.find(x=>x.c===lockCode)||{}).n);
+});
+/* 复制清单 */
+$("copyBtn").addEventListener("click", async () => {
+  const L = DB.filter(match).sort(sortBy);
+  if(!L.length) return toast("当前没有可复制的院校");
+  const head = `河南高职单招 2026 参考名单（${L.length} 所）\n`;
+  const body = L.slice(0,40).map((d,i)=>`${i+1}. ${d.n}（${d.c}）${d.p===1?"公办":"民办"}${d.lv===1?"·本科院校":""} ${d.ct} ${DK[d.dk].t}${d.i?" 招信息安全":""}${d.f?" 学费"+d.f[0]:""}`).join("\n");
+  const txt = head + body + (L.length>40?"\n…（只列前40所）":"");
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){ await navigator.clipboard.writeText(txt); }
+    else throw new Error("no clipboard");
+    toast("已复制，去粘贴给老师或家长");
+  }catch(err){
+    try{
+      const ta = document.createElement("textarea");
+      ta.value = txt; ta.style.position="fixed"; ta.style.opacity="0";
+      document.body.appendChild(ta); ta.select();
+      document.execCommand("copy"); document.body.removeChild(ta);
+      toast("已复制，去粘贴给老师或家长");
+    }catch(e2){ toast("复制失败，长按院校卡片手动记录"); }
+  }
+});
+$("barClear").addEventListener("click", () => { picked=[]; store.set("dz_pick",picked); render(); renderBar(); });
+$("barOpen").addEventListener("click", openCompare);
+$("mClose").addEventListener("click", () => $("modal").classList.remove("show"));
+$("modal").addEventListener("click", e => { if(e.target === $("modal")) $("modal").classList.remove("show"); });
+
+function openCompare(){
+  const rows = picked.map(c => DB.find(d => d.c === c)).filter(Boolean);
+  if(!rows.length) return;
+  const val = (d,k) =>
+      k==="p" ? (d.p===1?"公办":"民办")
+    : k==="l" ? (d.lv===1?"本科院校":"专科院校")
+    : k==="dk" ? DK[d.dk].t
+    : k==="info" ? (d.i?"是":"否")
+    : k==="fee" ? (d.f?(d.f[0]===d.f[1]?d.f[0]:d.f[0]+"–"+d.f[1]):"待核对")
+    : k==="house" ? (d.h?(d.h[0]===d.h[1]?d.h[0]:d.h[0]+"–"+d.h[1]):"—")
+    : k==="total" ? (t=>t?(t[0]===t[1]?wan(t[0]):wan(t[0])+"–"+wan(t[1]))+" 万":"待核对")(total3(d))
+    : d[k];
+  let h = "<tr><th></th>" + rows.map(d=>`<td>${d.n}<small>${d.ct} · 代码 ${d.c}</small></td>`).join("") + "</tr>";
+  [["p","性质"],["l","层次"],["dk","对口"],["info","招信息安全"],["fee","学费(元/年)"],["house","住宿(元)"],["total","三年学费+住"],["city","城市"]].forEach(([k,label])=>{
+    h += `<tr><th>${label}</th>` + rows.map(d=>`<td>${val(d,k)}</td>`).join("") + "</tr>";
+  });
+  $("ctable").innerHTML = h;
+  $("sheetTitle").textContent = "对比";
+  $("cmpBox").style.display = "block";
+  $("scoreBox").style.display = "none";
+  $("modal").classList.add("show");
+}
+let toastTimer;
+function toast(msg){
+  const t = $("toast");
+  t.textContent = msg; t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 1700);
+}
+window.addEventListener("scroll", () => { $("totop").classList.toggle("show", window.scrollY > 400); });
+$("totop").addEventListener("click", () => window.scrollTo({top:0,behavior:"smooth"}));
+
+$("cities").innerHTML = CITIES.map(c => `<button class="city${c==="全部"?" on":""}" data-city="${c}">${c}</button>`).join("");
+syncToggles(); render(); renderBar(); renderLock();
+</script>
+</body>
+</html>
