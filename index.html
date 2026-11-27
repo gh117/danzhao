@@ -220,13 +220,18 @@ mark{background:rgba(255,180,84,.38);color:inherit;border-radius:3px;padding:0 1
 .bd.chong.on{background:rgba(255,107,129,.92);border-color:transparent;color:#fff}
 .bd.wen.on{background:rgba(90,162,255,.92);border-color:transparent;color:#fff}
 .bd.bao.on{background:rgba(61,220,151,.9);border-color:transparent;color:#04291b}
+.bd.zero{opacity:.45;border-style:dashed}
+.bd.zero.on{opacity:1;border-style:solid}
+.empbtns{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.empbtns .btn{min-height:34px;font-size:12.5px;padding:0 12px}
 .scnote{font-size:11.5px;color:var(--tx3);line-height:1.7;margin-top:8px}
 .scnote b{color:var(--warn)}
 .t-chong{background:rgba(255,107,129,.18);color:var(--bad)}
 .t-wen{background:rgba(90,162,255,.18);color:var(--acc)}
 .t-bao{background:rgba(61,220,151,.16);color:var(--good)}
+.t-xuan{background:rgba(255,255,255,.07);color:var(--tx2)}
 .ln{color:var(--tx);font-weight:600}
-@media (prefers-color-scheme: light){.t-chong{color:#b81a35}.t-wen{color:#1d5bd0}.t-bao{color:#076a41}}
+@media (prefers-color-scheme: light){.t-chong{color:#b81a35}.t-wen{color:#1d5bd0}.t-bao{color:#076a41}.t-xuan{background:rgba(0,0,0,.06);color:#5b6472}}
 </style>
 </head>
 <body>
@@ -441,14 +446,14 @@ const store = {
 let picked = store.get("dz_pick", []).filter(c => DB.some(d => d.c === c)).slice(0,3);
 let lockCode = store.get("dz_lock", null);
 if(lockCode && !DB.some(d => d.c === lockCode)) lockCode = null;
-let st = { city:"全部", kw:"", pub:0, lv:0, dk:false, info:false, cheap:false, mj:"", sort:"dk", score:0, sci:1, band:"" };
+let st = { city:"全部", kw:"", pub:0, lv:0, dk:false, info:false, cheap:false, mj:"", sort:"dk", score:0, sci:1, band:"", showXuan:false };
 
 const CITIES = ["全部", ...Array.from(new Set(DB.map(d => d.ct))).sort()];
 const KM = {焦作:40,济源:100,新乡:110,郑州:130,洛阳:150,鹤壁:170,开封:190,安阳:190,许昌:200,平顶山:210,濮阳:250,漯河:270,周口:290,三门峡:310,商丘:350,驻马店:350,南阳:380,信阳:470};
 const kmOf = d => KM[d.ct] || null;
 
 /* ---- 分数线分档 ---- */
-const BAND = { chong:{t:"冲", d:"线比你高 1–15"}, wen:{t:"稳", d:"线在你分以下 0–20"}, bao:{t:"保", d:"比你低 21 分以上"} };
+const BAND = { chong:{t:"冲", d:"线比你高 1–15"}, wen:{t:"稳", d:"线在你分以下 0–20"}, bao:{t:"保", d:"比你低 21 分以上"}, xuan:{t:"悬", d:"线比你高 15 分以上"} };
 const lineOf = d => ((SCORE[d.c]||[])[st.sci]) || null;
 function bandOf(d){
   const L = lineOf(d);
@@ -496,7 +501,7 @@ function match(d){
     const L = lineOf(d);
     if(L == null) return false;
     const bd = bandOf(d);
-    if(bd === "xuan") return false;
+    if(bd === "xuan") return st.showXuan && !st.band;
     if(st.band && bd !== st.band) return false;
   }
   return true;
@@ -563,11 +568,30 @@ function cardHTML(d){
     </div>
   </article>`;
 }
+function emptyHTML(){
+  const c = bandCounts(), on = st.score > 0;
+  const sciTxt = st.sci ? "物理类" : "历史类";
+  if(on && st.band && c[st.band] === 0){
+    const why = st.band === "chong"
+      ? "没有院校的参考线比你高 1–15 分，你的分已经压过所有院校了"
+      : st.band === "wen"
+      ? "没有院校的线落在你分以下 0–20 分这个区间"
+      : "没有院校比你低 21 分以上，你的分还够不着「保」";
+    const alts = ["bao","wen","chong"].filter(k => k !== st.band && c[k] > 0);
+    return `<div class="empty"><span class="em">🫥</span>「${BAND[st.band].t}」这一档现在是 0 所<br>
+      <span style="font-size:12px;opacity:.75;line-height:1.7;display:inline-block;margin-top:6px">你 ${st.score} 分 · ${sciTxt}，${why}。</span>
+      <div class="empbtns">${alts.map(k=>`<button class="btn" data-empty-band="${k}">看「${BAND[k].t}」${c[k]} 所</button>`).join("")}<button class="btn ghost" data-reset2>重置筛选</button></div></div>`;
+  }
+  if(on && !st.band && (c.chong + c.wen + c.bao) === 0){
+    return `<div class="empty"><span class="em">📉</span>${st.score} 分这一档，一所都对不上<br>
+      <span style="font-size:12px;opacity:.75;line-height:1.7;display:inline-block;margin-top:6px">你的分比所有院校的参考线都低 15 分以上，按规则这些先藏起来了。</span>
+      <div class="empbtns"><button class="btn" data-show-xuan>还是看看这 ${c.xuan} 所</button><button class="btn ghost" data-reset2>重置筛选</button></div></div>`;
+  }
+  return '<div class="empty"><span class="em">🗂</span>这个组合下没有院校<br><span style="font-size:12px;opacity:.7">试着放宽条件，或点下面这颗按钮</span><br><button class="btn ghost" data-reset2 style="margin-top:12px">重置筛选</button></div>';
+}
 function render(){
   const L = DB.filter(match).sort(sortBy);
-  $("list").innerHTML = L.length
-    ? L.map(cardHTML).join("")
-    : '<div class="empty"><span class="em">🗂</span>这个组合下没有院校<br><span style="font-size:12px;opacity:.7">试着放宽条件，或点下面这颗按钮</span><br><button class="btn ghost" data-reset2 style="margin-top:12px">重置筛选</button></div>';
+  $("list").innerHTML = L.length ? L.map(cardHTML).join("") : emptyHTML();
   $("resLabel").textContent = `共 ${L.length} 所`;
   $("topCount").innerHTML = `<b>${L.length}</b> / ${DB.length} 所`;
   $("nDk").textContent = DB.filter(d=>d.dk===1).length;
@@ -579,16 +603,26 @@ function render(){
   updateScoreBar();
   renderActSum();
 }
-function updateScoreBar(){
-  const on = st.score > 0;
-  const base = DB.filter(matchBase);
+function bandCounts(){
   const c = { chong:0, wen:0, bao:0, xuan:0, none:0 };
-  base.forEach(d => { const b = bandOf(d); if(!b){ c.none++; return; } c[b]++; });
+  DB.filter(matchBase).forEach(d => { const b = bandOf(d); if(!b){ c.none++; return; } c[b]++; });
+  return c;
+}
+function updateScoreBar(){
+  const on = st.score > 0, c = bandCounts();
+  ["chong","wen","bao"].forEach(k => {
+    const b = document.querySelector(`#bands [data-band="${k}"]`);
+    if(b) b.classList.toggle("zero", on && c[k] === 0);
+  });
   $("nChong").textContent = on ? c.chong : "—";
   $("nWen").textContent   = on ? c.wen   : "—";
   $("nBao").textContent   = on ? c.bao   : "—";
+  let extra = "";
+  if(on && st.showXuan && !st.band) extra = `已经放开「差 15 分以外」的限制，${c.xuan} 所一起列在下面了。`;
+  else if(on && c.chong === 0 && c.wen === 0 && c.bao > 0) extra = "你的分高过所有院校的参考线，冲和稳都是空的，「保」就是全部。";
+  else if(on && c.bao === 0 && (c.chong + c.wen) > 0) extra = "没有学校比你低 21 分以上，先看「冲」和「稳」。";
   $("scNote").innerHTML = on
-    ? `你 ${st.score} 分 · ${st.sci?"物理类":"历史类"}：冲 ${c.chong} 所 / 稳 ${c.wen} 所 / 保 ${c.bao} 所；差 15 分以上 ${c.xuan} 所已隐藏${c.none?`；另有 <b>${c.none}</b> 所没有 2025 专科批线（民办本科 / 2026 新开校），没参与分档`:""}。`
+    ? `你 ${st.score} 分 · ${st.sci?"物理类":"历史类"}：冲 ${c.chong} 所 / 稳 ${c.wen} 所 / 保 ${c.bao} 所；差 15 分以上 ${c.xuan} 所已隐藏${c.none?`；另有 <b>${c.none}</b> 所没有 2025 专科批线（民办本科 / 2026 新开校），没参与分档`:""}。${extra?`<br><b>${extra}</b>`:""}`
     : "空着不影响下面的筛选。填了分，点冲 / 稳 / 保只看那一档。";
 }
 function renderActSum(){
@@ -695,7 +729,13 @@ $("myScore").addEventListener("input", e => {
   const v = Math.min(750, Number(raw) || 0);
   const clean = v ? String(v) : "";
   if(orig !== clean) e.target.value = clean;
-  st.score = v;
+  st.score = v; st.showXuan = false;
+  if(v && st.band && bandCounts()[st.band] === 0){
+    const gone = BAND[st.band].t;
+    st.band = "";
+    document.querySelectorAll("#bands .bd").forEach(x => { x.classList.remove("on"); x.setAttribute("aria-pressed","false"); });
+    toast(`「${gone}」这一档在 ${v} 分下是 0 所，已经退回到全部`);
+  }
   if(!v){ st.band = ""; document.querySelectorAll("#bands .bd").forEach(x => { x.classList.remove("on"); x.setAttribute("aria-pressed","false"); }); }
   render();
 });
@@ -708,7 +748,10 @@ $("segSci").addEventListener("click", e => {
 $("bands").addEventListener("click", e => {
   const b = e.target.closest("[data-band]"); if(!b) return;
   if(!st.score){ toast("先在上面填你考了多少分"); $("myScore").focus(); return; }
-  st.band = (st.band === b.dataset.band) ? "" : b.dataset.band;
+  const want = b.dataset.band;
+  if(st.band !== want && bandCounts()[want] === 0){ toast(`「${BAND[want].t}」这一档 0 所，点开也是空的`); return; }
+  st.band = (st.band === want) ? "" : want;
+  st.showXuan = false;
   document.querySelectorAll("#bands .bd").forEach(x => { const on = x.dataset.band === st.band; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on); });
   render();
   if(st.band){
@@ -729,12 +772,12 @@ $("actsum").addEventListener("click", e => {
   if(k==="info") st.info=false;
   if(k==="mj") st.mj="";
   if(k==="cheap") st.cheap=false;
-  if(k==="score"){ st.score=0; st.band=""; const ms=$("myScore"); if(ms) ms.value=""; document.querySelectorAll("#bands .bd").forEach(x=>x.classList.remove("on")); }
-  if(k==="band"){ st.band=""; document.querySelectorAll("#bands .bd").forEach(x=>x.classList.remove("on")); }
+  if(k==="score"){ st.score=0; st.band=""; st.showXuan=false; const ms=$("myScore"); if(ms) ms.value=""; document.querySelectorAll("#bands .bd").forEach(x=>x.classList.remove("on")); }
+  if(k==="band"){ st.band=""; st.showXuan=false; document.querySelectorAll("#bands .bd").forEach(x=>x.classList.remove("on")); }
   renderMajorBox(); syncToggles(); render();
 });
 $("reset").addEventListener("click", () => {
-  st = { city:"全部", kw:"", pub:0, lv:0, dk:false, info:false, cheap:false, mj:"", sort:"dk", score:0, sci:1, band:"" };
+  st = { city:"全部", kw:"", pub:0, lv:0, dk:false, info:false, cheap:false, mj:"", sort:"dk", score:0, sci:1, band:"", showXuan:false };
   const ms=$("myScore"); if(ms) ms.value="";
   document.querySelectorAll("#bands .bd").forEach(x=>x.classList.remove("on"));
   $("kw").value=""; $("sort").value="dk";
@@ -768,6 +811,14 @@ $("list").addEventListener("click", e => {
   }
 });
 $("list").addEventListener("click", e => {
+  const eb = e.target.closest("[data-empty-band]");
+  if(eb){
+    const k = eb.dataset.emptyBand;
+    st.band = k; st.showXuan = false;
+    document.querySelectorAll("#bands .bd").forEach(x => { const on = x.dataset.band === k; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on); });
+    render(); return;
+  }
+  if(e.target.closest("[data-show-xuan]")){ st.showXuan = true; st.band = ""; render(); toast("已经把 15 分以外的院校也列出来了"); return; }
   if(e.target.closest("[data-reset2]")) $("reset").click();
 });
 $("list").addEventListener("keydown", e => {
