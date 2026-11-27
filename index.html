@@ -265,7 +265,7 @@ mark{background:rgba(255,180,84,.38);color:inherit;border-radius:3px;padding:0 1
         <button class="bd wen" data-band="wen">稳 <em id="nWen">—</em></button>
         <button class="bd bao" data-band="bao">保 <em id="nBao">—</em></button>
       </div>
-      <div class="scnote" id="scNote">空着不影响下面的筛选。填了分，点冲 / 稳 / 保只看那一档。</div>
+      <div class="scnote" id="scNote" aria-live="polite">空着不影响下面的筛选。填了分，点冲 / 稳 / 保只看那一档。</div>
     </div>
     <div class="seg" id="seg">
       <button data-pub="0" class="on">全部</button>
@@ -697,14 +697,14 @@ $("myScore").addEventListener("input", e => {
 $("segSci").addEventListener("click", e => {
   const b = e.target.closest("[data-sci]"); if(!b) return;
   st.sci = Number(b.dataset.sci);
-  document.querySelectorAll("#segSci button").forEach(x => x.classList.toggle("on", Number(x.dataset.sci) === st.sci));
+  document.querySelectorAll("#segSci button").forEach(x => { const on = Number(x.dataset.sci) === st.sci; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on); });
   render();
 });
 $("bands").addEventListener("click", e => {
   const b = e.target.closest("[data-band]"); if(!b) return;
   if(!st.score){ toast("先在上面填你考了多少分"); $("myScore").focus(); return; }
   st.band = (st.band === b.dataset.band) ? "" : b.dataset.band;
-  document.querySelectorAll("#bands .bd").forEach(x => x.classList.toggle("on", x.dataset.band === st.band));
+  document.querySelectorAll("#bands .bd").forEach(x => { const on = x.dataset.band === st.band; x.classList.toggle("on", on); x.setAttribute("aria-pressed", on); });
   render();
 });
 $("actsum").addEventListener("click", e => {
